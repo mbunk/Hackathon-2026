@@ -1,0 +1,5 @@
+---
+title: "Hackathon 2026"
+---
+
+![](poster.png)

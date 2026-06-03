@@ -1,0 +1,37 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Hackathon 2026",
+    "section": "",
+    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "This a one-day Hackathon with the goal to reproduce a social scientific paper as a group.\nThe event will take place on 24th July from 9:30-15:15 at the Edinburgh Futures Institute (EFI)\nWe are supported by the University of Edinburgh Research Training Centre (RTC)."
+  },
+  {
+    "objectID": "signup.html",
+    "href": "signup.html",
+    "title": "Sign Up",
+    "section": "",
+    "text": "Are you interested in open and robust science? Curious about statistical social science methods? Please sign up!\nRegistration is open here."
+  },
+  {
+    "objectID": "about.html#motivation",
+    "href": "about.html#motivation",
+    "title": "About",
+    "section": "Motivation",
+    "text": "Motivation\nThere is an often-cited “reproducibility crisis” in the Social Sciences, where most published results go unverified. In response to these concerns, it is becoming more common for authors to make their code and data public. However, the code provided is often incomplete (e.g., does not include cleaning or recoding details) or is never tested by reviewers. Sometimes no code is provided at all, but there should be enough information in the methods section to rewrite the analysis.\nWe need time set aside for researchers to put existing articles to the test. The result will be to either add greater credibility to the claim (if the results match) or identify findings that need revisiting from the original authors (if results cannot be reproduced). Undertaking reproducibility work in a team environment also presents a collaborative learning opportunity for statistical social scientists to discuss their interpretations of the papers, share coding knowledge, and discuss best practices as a research community."
+  },
+  {
+    "objectID": "about.html#outputs",
+    "href": "about.html#outputs",
+    "title": "About",
+    "section": "Outputs",
+    "text": "Outputs\nParticipants will collaboratively publish the resulting code and comparison with paper findings on this Quarto website."
+  }
+]
