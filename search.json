@@ -1,0 +1,58 @@
+[
+  {
+    "objectID": "signup.html",
+    "href": "signup.html",
+    "title": "Sign Up",
+    "section": "",
+    "text": "Are you interested in open and robust science? Curious about statistical social science methods? Please sign up!\nRegistration is open here."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "This a one-day Hackathon with the goal to reproduce a social scientific paper as a group.\nThe event will take place on 24th July from 9:30-15:15 at the Edinburgh Futures Institute (EFI)\nWe are supported by the University of Edinburgh Research Training Centre (RTC)."
+  },
+  {
+    "objectID": "about.html#motivation",
+    "href": "about.html#motivation",
+    "title": "About",
+    "section": "Motivation",
+    "text": "Motivation\nThere is an often-cited “reproducibility crisis” in the Social Sciences, where most published results go unverified. In response to these concerns, it is becoming more common for authors to make their code and data public. However, the code provided is often incomplete (e.g., does not include cleaning or recoding details) or is never tested by reviewers. Sometimes no code is provided at all, but there should be enough information in the methods section to rewrite the analysis.\nWe need time set aside for researchers to put existing articles to the test. The result will be to either add greater credibility to the claim (if the results match) or identify findings that need revisiting from the original authors (if results cannot be reproduced). Undertaking reproducibility work in a team environment also presents a collaborative learning opportunity for statistical social scientists to discuss their interpretations of the papers, share coding knowledge, and discuss best practices as a research community."
+  },
+  {
+    "objectID": "about.html#outputs",
+    "href": "about.html#outputs",
+    "title": "About",
+    "section": "Outputs",
+    "text": "Outputs\nParticipants will collaboratively publish the resulting code and comparison with paper findings on this Quarto website."
+  },
+  {
+    "objectID": "info.html",
+    "href": "info.html",
+    "title": "Reproduction information",
+    "section": "",
+    "text": "We will be reproducing the Jung-Sook Lee (2014) The Relationship Between Student Engagement and Academic Performance: Is It a Myth or Reality?, The Journal of Educational Research, 107:3, 177-185, DOI: 10.1080/00220671.2013.807491."
+  },
+  {
+    "objectID": "info.html#article",
+    "href": "info.html#article",
+    "title": "Reproduction information",
+    "section": "",
+    "text": "We will be reproducing the Jung-Sook Lee (2014) The Relationship Between Student Engagement and Academic Performance: Is It a Myth or Reality?, The Journal of Educational Research, 107:3, 177-185, DOI: 10.1080/00220671.2013.807491."
+  },
+  {
+    "objectID": "info.html#data-access",
+    "href": "info.html#data-access",
+    "title": "Reproduction information",
+    "section": "Data access",
+    "text": "Data access\nThe article uses the U.S. data from Program for International Student Assessment 2000 (PISA 2000). PISA data is open access and can be downloaded after providing researcher information at the PISA website.\nAn unfortunate issues with the PISA data from the year 2000 is that the data files (.txt) require SAS or SPSS scripts to match up the data (numeric and text responses) and metadata (variable and value labels). This does not work well when using other software. Luckily, there exists a package which performs this matching in Stata. This includes already prepared Stata .dta files with the data present. For simplicity’s sake, we recommend downloading the PISA 2000 .dta file directly from the authors of that package: https://www.evidin.pl/en/data/\nThe order of operations is to:\n\nRegister your information and the project description at the PISA website.\nDownload the PISA 2000 data from https://www.evidin.pl/en/data/ and place into a data folder (called _data in this repository).\nExtract the files from the .zip file\nLoad the .dta files into R using the haven package from CRAN.\n\nYour data folder should look like this:\n\nNext, use haven to read each file into your R session.\n\ninstall.packages(\"haven\")\n\nintcogn &lt;- haven::read_dta(file.path(\"_data\", \"intcogn.dta\"))\nschool &lt;- haven::read_dta(file.path(\"_data\", \"PISA2000_school_questionnaire.dta\"))\nm &lt;- haven::read_dta(file.path(\"_data\", \"pisa2000m.dta\"))\nr &lt;- haven::read_dta(file.path(\"_data\", \"pisa2000r.dta\"))\ns &lt;- haven::read_dta(file.path(\"_data\", \"pisa2000s.dta\"))\n\nThe data are now ready to use!"
+  },
+  {
+    "objectID": "info.html#references",
+    "href": "info.html#references",
+    "title": "Reproduction information",
+    "section": "References",
+    "text": "References\nWe would like to acknowledge the work to put the PISA 2000 data into a Stata format with the following references:\nMaciej Jakubowski & Artur Pokropek, 2013. „PISATOOLS: Stata module to facilitate analysis of the data from the PISA OECD study”, Statistical Software Components, Boston College Department of Economics.\nJakubowski, M., & Pokropek, A. (2019). piaactools: A program for data analysis with PIAAC data. The Stata Journal, 19(1), 112–128. https://doi.org/10.1177/1536867X19830909"
+  }
+]

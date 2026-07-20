@@ -1,7 +1,0 @@
----
-title: "Sign Up"
----
-
-Are you interested in open and robust science? Curious about statistical social science methods? Please sign up!
-
-Registration is open [here](https://forms.cloud.microsoft/pages/responsepage.aspx?id=sAafLmkWiUWHiRCgaTTcYYJgl3-GAvRNpFz-FEiZWM5UOEZSTkw2WFkxTUw4RUxOTTRFVlozODhTWi4u&route=shorturl).
