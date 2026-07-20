@@ -9,6 +9,7 @@ website:
         text: Home
       - about.qmd
       - signup.qmd
+      - info.qmd
 
 format:
   html:

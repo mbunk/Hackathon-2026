@@ -5,3 +5,10 @@
 
 /.quarto/
 **/*.quarto_ipynb
+
+
+*.sav
+*.sas7bdat
+*.zip
+*.dat
+*.dta
