@@ -1,6 +1,8 @@
 ---
 title: "Reproduce Lee 2014"
 format: html
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Summary
@@ -82,6 +84,7 @@ r <- r |>
 # Filter to US for school-level dataset (school)
 school <- school |> 
   dplyr::filter(country == "840")
+
 ```
 
 
@@ -90,33 +93,47 @@ school <- school |>
 # need to double check how some of these cat levels are coded in the docs
 
 ## Locate some key vars
+## 
+# Set data types TODO
+# Fix categorical data
 
 student <- r |>
   dplyr::mutate(
+    # Grade 
     grade = as.factor(dplyr::case_when(
       st02q01 == 9 ~ "ninth_0",
       st02q01 == 10 ~ "tenth_1",
-      .default = st02q01
-      )),
+      st02q01 %in% c("97", "99") ~ NA,
+      .default = as.factor(st02q01)
+    )),
+    # Gender
     gender = as.factor(dplyr::case_when(
       st03q01 == 1 ~ "female_1",
       st03q01 == 2 ~ "male_0",
       .default = NA
-      )),
+    )),
+    # Language spoken at home
     language = as.factor(dplyr::case_when(
       st17q01 == 1 ~ "english_1",
       st17q01 %in% c("2", "3", "4") ~ "other_0",
       st17q01 %in% c("7", "8", "9") ~ NA
-      )),
-    emote =  dplyr::case_when(
-      emote == 97 ~ NA,
+    )),
+    # Behavioural engagement
+    behave =  dplyr::case_when(
+      effper == 97 ~ NA,
       .default = effper
-      ),
-    belong =  dplyr::replace_when(
+    ),
+    # Emotional engagement
+    emote = dplyr::case_when(
       belong == 97 ~ NA,
       .default = belong
-      ),
-    hisei = as.numeric(hisei),
+    ),
+    # SES
+    hisei = as.numeric(dplyr::case_when(
+      hisei %in% c("97", "99") ~ NA,
+      .default = hisei
+    )),
+    # Reading Scores
     reading1 = scale(pv1read),
     reading2 = scale(pv2read),
     reading3 = scale(pv3read),
@@ -124,12 +141,12 @@ student <- r |>
     reading5 = scale(pv5read)
   ) |>
   dplyr::select(
-    reading1:reading5,
-    belong, emote,
+    reading1, reading2, reading3, reading4, reading5,
+    behave, emote,
     grade, gender, language,
     country, schoolid, stidstd,
-    hisei
-  ) # recode hisei
+    hisei)
+
 
 schl <- school |>
   dplyr::mutate(
@@ -137,27 +154,15 @@ schl <- school |>
       sc03q01 == 1 ~ 1,
       sc03q01 == 2 ~ 0,
       sc03q01 %in% c("7", "8", "9") ~ 3
-    ))
-  
-  ) |>
-    dplyr::mutate(
+    ))) |>
+  dplyr::mutate(
     type_2 = as.factor(dplyr::case_when(
       schltype %in% c("1", "2") ~ 0,
       schltype == 3 ~ 1,
       schltype %in% c("7", "8", "9") ~ 2
-    ))
-  
-  ) |>
-  #   dplyr::mutate(
-  #   ses = as.factor(dplyr::case_when(
-  #      == 1 ~ 1,
-  #     sc03q01 == 2 ~ 0,
-  #     sc03q01 %in% c("7", "8", "9") ~ 3
-  #   ))
-  # 
-  # ) |>
+    ))) |>
   dplyr::select(
-    type,
+    type_1, type_2,
     country, schoolid, wnrschbw
   )
 
@@ -165,13 +170,29 @@ ses_mean <- r |>
   dplyr::group_by(schoolid) |> 
   dplyr::summarise(mean = mean(hisei, na.rm=T)) # are 97  99 valid or NA's ?
 
-schl <- dplyr::left_join(schl, ses_mean, by = dplyr::join_by(country, schoolid))
+school_with_ses <- dplyr::left_join(schl, ses_mean, by = dplyr::join_by(schoolid))
 
-df <- dplyr::full_join(student, schl, by = dplyr::join_by(country, schoolid))
-
-df |> !is.na()
+student_and_school <- dplyr::left_join(student, school_with_ses, by = dplyr::join_by(schoolid))
 
 ```
+
+```{r filter}
+
+student_and_school |> summary()
+
+student_and_school_filt <- student_and_school |> 
+  tidyr::drop_na(emote, behave) |> 
+  dplyr::filter(grade %in% c("ninth_0", "tenth_1"))
+
+summary(student_and_school_filt)
+```
+
+
+
+```{r descriptive-table}
+student_and_school
+```
+
 
 
 Empty (null model)
@@ -185,7 +206,7 @@ This just tests the variance between schools.
 m0 <- lme4::lmer(reading ~ 1 + (1 | schoolid),
                  data = df,
                  REML = TRUE
-                 )
+)
 
 summary(m0)
 performance::icc(m0) 
