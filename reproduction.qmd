@@ -12,19 +12,12 @@ The objective of this project is to reproduce the paper: Lee, J.-S. 2014 ‘The 
 
 PISA 2000 data are downloaded from [https://www.evidin.pl/en/data/](https://www.evidin.pl/en/data/).
 
-```{r}
-# Mystery data: TBD
-intcogn <- haven::read_dta(file.path("_data", "intcogn.dta"))
-
+```{r load-data}
 # School-level data
 school <- haven::read_dta(file.path("_data", "PISA2000_school_questionnaire.dta"))
 
-# More mysteries
-m <- haven::read_dta(file.path("_data", "pisa2000m.dta"))
-
 # Reading data
 r <- haven::read_dta(file.path("_data", "pisa2000r.dta"))
-s <- haven::read_dta(file.path("_data", "pisa2000s.dta"))
 ```
 
 ## Sample
