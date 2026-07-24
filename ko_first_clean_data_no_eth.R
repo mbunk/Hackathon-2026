@@ -3,7 +3,7 @@ library(dplyr)
 library(labelled)
 
 # Load in the reading scores dataset
-datapath <- "~/Library/CloudStorage/OneDrive-UniversityofStirling/0_courses_seminars/lss_hackathon_2026/PISA2000"
+datapath <- "DATA/PISA2000"
 pisa <- read_dta(file.path(datapath, "pisa2000r.dta")) |> as_factor()
 
 school_pisa <- read_dta("/Users/kateohara/Library/CloudStorage/OneDrive-UniversityofStirling/0_courses_seminars/lss_hackathon_2026/PISA2000/PISA2000_school_questionnaire.dta")
