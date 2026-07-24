@@ -1,0 +1,229 @@
+---
+title: "Reproduce Lee 2014"
+format: html
+---
+
+## Summary
+
+The objective of this project is to reproduce the paper: Lee, J.-S. 2014 ‘The Relationship Between Student Engagement and Academic Performance: Is It a Myth or Reality?’, The Journal of Educational Research 107(3): p.177–185. [doi.org/10.1080/00220671.2013.807491](https://doi.org/10.1080/00220671.2013.807491).
+
+
+## Load data
+
+PISA 2000 data are downloaded from [https://www.evidin.pl/en/data/](https://www.evidin.pl/en/data/).
+
+```{r}
+# Mystery data: TBD
+intcogn <- haven::read_dta(file.path("_data", "intcogn.dta"))
+
+# School-level data
+school <- haven::read_dta(file.path("_data", "PISA2000_school_questionnaire.dta"))
+
+# More mysteries
+m <- haven::read_dta(file.path("_data", "pisa2000m.dta"))
+
+# Reading data
+r <- haven::read_dta(file.path("_data", "pisa2000r.dta"))
+s <- haven::read_dta(file.path("_data", "pisa2000s.dta"))
+```
+
+## Sample
+
+Checks:
+
+- Study uses the U.S. sample
+- Limited to 9th and 10th grade students (98% of U.S. sample)
+- Excluded students with missing values on **student engagement** and **academic performance**.
+- Final sample size used: *3,268 students from 121 schools*.
+
+Point of order: Real number may be 3,269 students and 141 schools n 
+
+
+## Variables
+
+**Target variables:**
+
+- reading literacy (incl. the 3 domains of processing skills, knowledge and understanding)
+- behavioural engagement items are: (1) working hard, (2) working despite difficulty, (3) trying one's best to acquire knowledge and skills, and (4) putting forth one's best effort
+- emotional engagement: sense of belonging in school.
+
+**Covariates:**
+
+- grade: grade 10 = 1, grade 9 = 0
+- gender: female = 1, male = 0.
+- race/ethnicity:  European American = 0, African American = 2, Latino/Hispanic = 3, Other = 4.
+- language spoken at home: English = 1, other = 0.
+- individual SES: highest ISEI (HIESI) of parent used.
+- school-mean SES: average HISEI value in school.
+- School type: private = 0, public = 1, unknown = 2.
+
+
+**Treatment:**
+
+- All continuous variables were standardized to mean = 0 and sd = 1.
+
+Check:
+
+- internal reliability of behavioural engagement = Chronbach's alpha = 0.83
+- Chronbach's alpha = 0.86 for emotional engagement/sense of belonging
+
+## Analysis
+
+- Multilevel model to adjust for student nesting within schools.
+
+- Sampling design was **not** adjusted for.
+
+- Level 1: students
+- Level 2: school.
+
+Random intercepts and slops adopted to include the unmeasured heterogeneity between schools.
+
+## Main effect model
+
+```{r simplify-datasets}
+# Filter to US for student dataset (s)
+r <- r |> 
+  dplyr::filter(country == "840")
+
+
+# Filter to US for school-level dataset (school)
+school <- school |> 
+  dplyr::filter(country == "840")
+```
+
+
+```{r recoding-key-variables}
+# test  model with subset of variables that I could find
+# need to double check how some of these cat levels are coded in the docs
+
+## Locate some key vars
+
+student <- r |>
+  dplyr::mutate(
+    grade = as.factor(dplyr::case_when(
+      st02q01 == 9 ~ "ninth_0",
+      st02q01 == 10 ~ "tenth_1",
+      .default = st02q01
+      )),
+    gender = as.factor(dplyr::case_when(
+      st03q01 == 1 ~ "female_1",
+      st03q01 == 2 ~ "male_0",
+      .default = NA
+      )),
+    language = as.factor(dplyr::case_when(
+      st17q01 == 1 ~ "english_1",
+      st17q01 %in% c("2", "3", "4") ~ "other_0",
+      st17q01 %in% c("7", "8", "9") ~ NA
+      )),
+    emote =  dplyr::case_when(
+      emote == 97 ~ NA,
+      .default = effper
+      ),
+    belong =  dplyr::replace_when(
+      belong == 97 ~ NA,
+      .default = belong
+      ),
+    hisei = as.numeric(hisei),
+    reading1 = scale(pv1read),
+    reading2 = scale(pv2read),
+    reading3 = scale(pv3read),
+    reading4 = scale(pv4read),
+    reading5 = scale(pv5read)
+  ) |>
+  dplyr::select(
+    reading1:reading5,
+    belong, emote,
+    grade, gender, language,
+    country, schoolid, stidstd,
+    hisei
+  ) # recode hisei
+
+schl <- school |>
+  dplyr::mutate(
+    type_1 = as.factor(dplyr::case_when(
+      sc03q01 == 1 ~ 1,
+      sc03q01 == 2 ~ 0,
+      sc03q01 %in% c("7", "8", "9") ~ 3
+    ))
+  
+  ) |>
+    dplyr::mutate(
+    type_2 = as.factor(dplyr::case_when(
+      schltype %in% c("1", "2") ~ 0,
+      schltype == 3 ~ 1,
+      schltype %in% c("7", "8", "9") ~ 2
+    ))
+  
+  ) |>
+  #   dplyr::mutate(
+  #   ses = as.factor(dplyr::case_when(
+  #      == 1 ~ 1,
+  #     sc03q01 == 2 ~ 0,
+  #     sc03q01 %in% c("7", "8", "9") ~ 3
+  #   ))
+  # 
+  # ) |>
+  dplyr::select(
+    type,
+    country, schoolid, wnrschbw
+  )
+
+ses_mean <- r |> 
+  dplyr::group_by(schoolid) |> 
+  dplyr::summarise(mean = mean(hisei, na.rm=T)) # are 97  99 valid or NA's ?
+
+schl <- dplyr::left_join(schl, ses_mean, by = dplyr::join_by(country, schoolid))
+
+df <- dplyr::full_join(student, schl, by = dplyr::join_by(country, schoolid))
+
+df |> !is.na()
+
+```
+
+
+Empty (null model)
+
+This just tests the variance between schools.
+
+```{r}
+#install.packages("lme4")
+#install.packages("performance")
+
+m0 <- lme4::lmer(reading ~ 1 + (1 | schoolid),
+                 data = df,
+                 REML = TRUE
+                 )
+
+summary(m0)
+performance::icc(m0) 
+```
+
+Random intercept with all x vars
+
+Tests main effect of predictive variables with a random effect for school ID.
+
+```{r}
+m1 <- lme4::lmer(
+  reading ~ grade + gender + language + type + (1 | schoolid),
+  data = df,
+  REML = TRUE
+)
+
+summary(m1)
+
+
+```
+
+Tests main effect of predictive variables with predictive model at the level 2 for schools.
+
+
+
+Compare models using likelihood ratio test
+
+```{r}
+m0_ml <- update(m0, REML = FALSE)
+m1_ml <- update(m1, REML = FALSE)
+
+anova(m0_ml, m1_ml)   # tests whether the random slope improves fit
+
+```
