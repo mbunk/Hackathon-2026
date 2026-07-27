@@ -13,3 +13,6 @@
 *.dat
 *.dta
 _data/pisa2000.csv
+*.RDS 
+*.pdf
+_data/pisa2000_imputed.csv

@@ -1,0 +1,177 @@
+---
+title: "Report using US 2000 PISA Dataset"
+editor: source 
+---
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+
+rm(list=ls())
+
+library(dplyr)
+
+source("US2000_code/scripts/0001_clean_vars.R")
+
+`%notin%` <- Negate(`%in%`)
+
+
+```
+
+Reproducing methods in the following article: 
+
+> Jung-Sook Lee (2014) The Relationship Between Student Engagement and Academic Performance: Is It a Myth or Reality?, The Journal of Educational Research, 107:3, 177-185, DOI: 10.1080/00220671.2013.807491
+
+
+## Data Source
+
+US PISA 2000 Dataset 
+
+<https://nces.ed.gov/use-work/resource-library/resource/cddvdhard-drive/program-international-student-assessment-pisa-2000-u-s-public-use-data-files-and-electronic-codebook>
+
+## Descriptives
+
+- created metadata/items_replicate.csv and numbered the metadata/Lee_2014_numbered_columns.pdf listing the details for all the main figures to reproduce
+- note removed one student with reading score \~9999
+- guess work on what schools are actually 'responding' and which are 'replacement' i.e. 142 schools in sample but paper reports this is 121
+- best guess is schoolid_recoded where students from 'replacement / partly responding schools' are artificially merged to other 'neighbourhing schools' derived this by hand based on one paragraph in the us handbook - part responding school and core sample school match details in metadata/replacement_codes.csv
+
+> Replacement schools were assigned according to the following rules: The preceding school on the frame was assigned as the first replacement school for each sampled school and the second school was assigned as the second replacement school, unless the candidate replacement school is a sampled school or is in a different PSU, has a different minority status for public schools, or has a different school type for private schools. If a candidate replacement school neighbors two sampled schools, it is selected as a replacement for the sampled school that it precedes. Under these rules, some sampled schools can be assigned only one replacement, and some can be assigned no replacement schools.
+
+- used warm likelihood estimate of reading not plausible values and grand mean centered / did not center within clusters
+
+- did not derive own factors so dont know how these were centered
+
+- took average across responses to check reliability (in derived variables these are the warm likelihood estimates?) also this was not included in the US data so had to merge from the dta format made available by researcher in README
+
+- for race combined two variables one asking Hispanic or not and one asking race did not use race_dv because did not know coding for this
+
+### item analysis for emote engagement ?
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+(epmr::rstudy(student[, emote_engagement], use = "complete")) # alpha = 0.86 is 0.85
+```
+
+### item analysis for behave engagement ?
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+(epmr::rstudy(student[, behave_engagement], use = "complete")) # alpha = 0.83 is 0.83
+```
+
+### Table 1
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+rm(list=setdiff(ls(), list("sample")))
+
+source("US2000_code/helper/Table1_function.R")
+
+(table1)
+
+```
+
+### Table 2
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+source("US2000_code/helper/Table2_function.R")
+
+table2 <- corr_table  %>% gt()
+
+(table2)
+
+```
+
+## MLM Model
+
+### Table 3
+
+```{r need-to-impute}
+#| echo: false
+#| message: false
+#| warning: false
+
+sample <- sample |> 
+  dplyr::mutate_at(c('wleread'), ~(scale(as.numeric(.)) %>% as.vector))
+
+# comment to not re-run imputation if already complete
+source("US2000_code/scripts/0002_missing_values.R") # 15 imputed datasets take 30 mins!
+source("US2000_code/scripts/0004_mlm.R") 
+source("US2000_code/helper/Table3_function.R")
+
+(html_tbl)
+
+```
+
+## Mediation Results
+
+### Figure 1
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+#| echo: false
+
+source("US2000_code/scripts/0005_mediation.R") # bootsrtap estimation takes 5-10 mins!
+
+```
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(semPlot)
+
+(semPaths(
+  fit,
+  what = "std",          # standardized coefficients
+  whatLabels = "std",
+  layout = "tree",
+  style = "ram",
+  edge.label.cex = 1.2,
+  sizeMan = 10,
+  residuals = FALSE,
+  intercepts = FALSE,
+  nCharNodes = 0
+)
+)
+
+```
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+
+(summary(fit, standardized = TRUE))
+
+indirect_res <- cbind(
+  indirect,
+  se_indirect,
+  z_value,
+  p_value
+) 
+
+(indirect_res)
+
+```
