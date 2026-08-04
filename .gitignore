@@ -12,3 +12,6 @@
 *.zip
 *.dat
 *.dta
+kate_notebook.R
+first_clean_pisa2000r.dta
+filtered_pisa2000r.dta
