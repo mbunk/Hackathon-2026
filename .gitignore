@@ -7,7 +7,7 @@
 **/*.quarto_ipynb
 _site/*
 Report_US2000Data_files/*
-!_site/.gitkeep 
+!**/.gitkeep
 
 *.sav
 *.sas7bdat
