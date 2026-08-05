@@ -5,7 +5,9 @@
 
 /.quarto/
 **/*.quarto_ipynb
-
+_site/*
+Report_US2000Data_files/*
+!_site/.gitkeep 
 
 *.sav
 *.sas7bdat
@@ -17,3 +19,4 @@ _data/pisa2000.csv
 *.pdf
 _data/pisa2000_imputed.csv
 *.rda
+*.sas

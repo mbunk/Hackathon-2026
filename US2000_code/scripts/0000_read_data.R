@@ -6,7 +6,7 @@ library(readr)
 library(stringr)
 library(dplyr)
 
-# Read SAS syntax
+# Read SAS syntax from the US data source 
 sas <- readLines("metadata/read.sas")
 
 # Extract INPUT block lines
